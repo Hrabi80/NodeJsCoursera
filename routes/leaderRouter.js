@@ -1,43 +1,75 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const mongoose = require('mongoose');
 const leaderRouter = express.Router();
 leaderRouter.use(bodyParser.json());
+const leader = require('../models/leaders');
 
 leaderRouter.route('/')
-.all((req,res,next)=>{
-    res.statusCode = 200;
-    res.setHeader('Content-Type','text/plain');
-    next();
-})
 .get((req,res,next)=>{
-    res.end('i will send all leaders to ya <3');
+    leader.find({})
+    .then((lead)=>{
+        res.status.code=200;
+        res.setHeader('Content-Type','application/json');
+        res.json(lead);
+    },(err)=>next(err))
+    .catch((err)=>next(err));
 })
 .post((req,res,next)=>{
-    res.end('I will add one leader: '+req.body.name+' with details : '+req.body.description);
+    leader.create(req.body)
+    .then((lead)=>{
+        console.log('leader added to database',lead)
+        res.status.code=200;
+        res.setHeader('Content-Type','application/json');
+        res.json(lead);
+    },(err)=>next(err))
+    .catch((err)=>next(err));
 })
 .put((req,res,next)=>{
     res.statusCode=403;
     res.end("Sorry this operation is not allowed on leaders");
 })
 .delete((req,res,next)=>{
-    res.end("we are going to delete all the leaders");
+    leader.remove({})
+    .then((resp)=>{
+        res.status.code=200;
+        res.setHeader('Content-Type','application/json');
+        res.json(resp);
+    },(err)=>next(err))
+    .catch((err)=>next(err));  
 });
 
 leaderRouter.route('/:leaderId')
 .get((req,res,next)=>{
-    res.end('We are going to send the leader n : '+ req.params.leaderId);
+    leader.findById(req.params.leaderId)
+    .then((lead)=>{
+        res.status.code=200;
+        res.setHeader('Content-Type','application/json');
+        res.json(lead);
+    },(err)=>next(err))
+    .catch((err)=>next(err));
 })
 .post((req,res,next)=>{
     res.statusCode = 403;
     res.end('POST operation is not supported on /leaders/:'+req.params.leaderId);
 })
 .put((req,res,next)=>{
-    res.write('updating the leader '+req.params.leaderId + '\n');
-    res.end('will update the leader: '+ req.body.name + ' with details: '+req.body.description);
+    leader.findByIdAndUpdate(req.params.leaderId,{$set:req.body},{new:true})
+    then((lead)=>{
+        res.status.code=200;
+        res.setHeader('Content-Type','application/json');
+        res.json(lead);
+    },(err)=>next(err))
+    .catch((err)=>next(err));
 })
 .delete((req,res,next)=>{
-    res.end('Delete the leader: '+ req.params.leaderId);
+    leader.findByIdAndRemove(req.params.leaderId)
+    .then((resp)=>{
+        res.status.Code=200;
+        res.setHeader('Content-Type','application/json');
+        res.json(resp);
+    },(err)=>next(err))
+    .catch((err)=>next(err));
 });
 
 
