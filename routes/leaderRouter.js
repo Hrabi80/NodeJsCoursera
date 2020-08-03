@@ -16,7 +16,7 @@ leaderRouter.route('/')
     },(err)=>next(err))
     .catch((err)=>next(err));
 })
-.post(authenticate.verifyUser,(req,res,next)=>{
+.post(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     leader.create(req.body)
     .then((lead)=>{
         console.log('leader added to database',lead)
@@ -26,11 +26,11 @@ leaderRouter.route('/')
     },(err)=>next(err))
     .catch((err)=>next(err));
 })
-.put(authenticate.verifyUser,(req,res,next)=>{
+.put(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     res.statusCode=403;
     res.end("Sorry this operation is not allowed on leaders");
 })
-.delete(authenticate.verifyUser,(req,res,next)=>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     leader.remove({})
     .then((resp)=>{
         res.status.code=200;
@@ -50,11 +50,11 @@ leaderRouter.route('/:leaderId')
     },(err)=>next(err))
     .catch((err)=>next(err));
 })
-.post(authenticate.verifyUser,(req,res,next)=>{
+.post(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     res.statusCode = 403;
     res.end('POST operation is not supported on /leaders/:'+req.params.leaderId);
 })
-.put(authenticate.verifyUser,(req,res,next)=>{
+.put(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     leader.findByIdAndUpdate(req.params.leaderId,{$set:req.body},{new:true})
     then((lead)=>{
         res.status.code=200;
@@ -63,7 +63,7 @@ leaderRouter.route('/:leaderId')
     },(err)=>next(err))
     .catch((err)=>next(err));
 })
-.delete(authenticate.verifyUser,(req,res,next)=>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     leader.findByIdAndRemove(req.params.leaderId)
     .then((resp)=>{
         res.status.Code=200;
